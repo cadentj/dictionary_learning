@@ -3,9 +3,7 @@ from nnsight import LanguageModel
 import gc
 from tqdm import tqdm
 
-from .config import DEBUG
-
-if DEBUG:
+if False:
     tracer_kwargs = {'scan' : True, 'validate' : True}
 else:
     tracer_kwargs = {'scan' : False, 'validate' : False}
@@ -50,7 +48,7 @@ class ActivationBuffer:
         self.io = io
         self.n_ctxs = n_ctxs
         self.ctx_len = ctx_len
-        self.activation_buffer_size = n_ctxs * ctx_len
+        self.activation_buffer_size = int(n_ctxs * ctx_len)
         self.refresh_batch_size = refresh_batch_size
         self.out_batch_size = out_batch_size
         self.device = device
@@ -121,10 +119,11 @@ class ActivationBuffer:
                     invoker_args={"truncation": True, "max_length": self.ctx_len},
                 ):
                     if self.io == "in":
-                        hidden_states = self.submodule.input[0].save()
+                        hidden_states = self.submodule.input.save()
                     else:
                         hidden_states = self.submodule.output.save()
-                    input = self.model.input.save()
+                    input = self.model.inputs.save()
+
             attn_mask = input.value[1]["attention_mask"]
             hidden_states = hidden_states.value
             if isinstance(hidden_states, tuple):
