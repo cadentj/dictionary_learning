@@ -170,6 +170,10 @@ class GradientBuffer:
             gradients = gradients.value
             gradients = gradients[:, :-1][attn_mask != 0]
 
+            # Scale gradients to unit norm
+            eps = t.finfo(gradients.dtype).eps
+            gradients = gradients / (gradients.norm(dim=-1, keepdim=True) + eps)
+
             remaining_space = self.gradient_buffer_size - current_idx
             assert remaining_space > 0
             gradients = gradients[:remaining_space]

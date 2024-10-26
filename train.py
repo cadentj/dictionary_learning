@@ -17,7 +17,6 @@ submodule = model.gpt_neox.layers[3] # layer 1 MLP
 activation_dim = 512 # output dimension of the MLP
 dictionary_size = 64 * activation_dim
 
-
 # %%
 
 import json
@@ -42,9 +41,6 @@ data_iterator = load_zst_files(base_path)
 
 # %%
 
-from datasets import load_dataset
-
-data = load_dataset("kh4dien/fineweb-100m-sample", split="train")
 data = iter(data_iterator)
 
 buffer = GradientBuffer(
@@ -68,16 +64,20 @@ trainer_cfg = {
     "layer" : 1,
     "lm_name" : model_name,
     "device": device,
-    "wandb_name" : "test",
+    "wandb_name" : "auxk-fix",
 }
+
+log_steps = 128
+save_steps = log_steps * 100
 
 # train the sparse autoencoder (SAE)
 ae = trainSAE(
     data=buffer,  # you could also use another (i.e. pytorch dataloader) here instead of buffer
     trainer_configs=[trainer_cfg],
     save_dir="dictionaries",
+    save_steps=save_steps,
     use_wandb=True,
     wandb_entity="gradient-features",
     wandb_project="topk",
-    log_steps=128,
+    log_steps=log_steps,
 )

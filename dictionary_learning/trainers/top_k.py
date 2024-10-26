@@ -139,7 +139,7 @@ class TrainerTopK(SAETrainer):
         dict_class=AutoEncoderTopK,
         activation_dim=512,
         dict_size=64 * 512,
-        k=100,
+        k=32,
         auxk_alpha=1 / 32,  # see Appendix A.2
         decay_start=24000,  # when does the lr decay start
         steps=30000,  # when when does training end
@@ -247,7 +247,13 @@ class TrainerTopK(SAETrainer):
             # top k living latents
             e_hat = self.ae.decode(auxk_acts_BF)
             auxk_loss = (e_hat - e).pow(2)  # .sum(0)
-            auxk_loss = scale * t.mean(auxk_loss / total_variance)
+
+            # Avoid division by zero
+            eps = t.finfo(total_variance.dtype).eps
+            auxk_loss = scale * t.mean(auxk_loss / (total_variance + eps))
+
+            # Avoid NaN
+            auxk_loss = t.where(t.isnan(auxk_loss), auxk_loss.new_tensor(0.0), auxk_loss)
         else:
             auxk_loss = x_hat.new_tensor(0.0)
 
