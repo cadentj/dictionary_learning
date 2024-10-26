@@ -8,7 +8,6 @@ import torch as t
 import torch.nn as nn
 from collections import namedtuple
 
-from ..config import DEBUG
 from ..dictionary import Dictionary
 from ..trainers.trainer import SAETrainer
 

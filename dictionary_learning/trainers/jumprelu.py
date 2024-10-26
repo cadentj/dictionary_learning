@@ -3,8 +3,10 @@ from collections import namedtuple
 import torch
 import torch.autograd as autograd
 from torch import nn
+from torch.optim.lr_scheduler import LambdaLR
+from transformers import get_scheduler
 
-from ..dictionary import Dictionary, JumpReluAutoEncoder
+from ..dictionary import JumpReluAutoEncoder
 from .trainer import SAETrainer
 
 
@@ -94,7 +96,6 @@ class TrainerJumpRelu(nn.Module, SAETrainer):
         self.submodule_name = submodule_name
         self.device = device
         self.steps = steps
-        self.lr = lr
         self.seed = seed
 
         self.bandwidth = bandwidth
@@ -113,6 +114,15 @@ class TrainerJumpRelu(nn.Module, SAETrainer):
         # Parameters from the paper
         self.optimizer = torch.optim.Adam(
             self.ae.parameters(), lr=lr, betas=(0.0, 0.999), eps=1e-8
+        )
+
+        self.lr = lr
+
+        self.lr_scheduler: LambdaLR = get_scheduler(
+            "cosine",
+            self.optimizer,
+            num_warmup_steps=1_000,
+            num_training_steps=4_000_000,
         )
 
         self.logging_parameters = []
@@ -147,7 +157,9 @@ class TrainerJumpRelu(nn.Module, SAETrainer):
         torch.nn.utils.clip_grad_norm_(self.ae.parameters(), 1.0)
 
         self.optimizer.step()
+        self.lr_scheduler.step()
         self.optimizer.zero_grad()
+
         return loss.item()
 
     @property

@@ -59,7 +59,7 @@ class GradientBuffer:
         self.device = device
 
         self.criterion = t.nn.CrossEntropyLoss()
-        self.is_tuple = False
+        self.is_tuple = True
     
     def __iter__(self):
         return self
@@ -166,9 +166,9 @@ class GradientBuffer:
                     )
                     loss.backward()
             
-            attn_mask = tokenized_batch["attention_mask"][:, -1:]
+            attn_mask = tokenized_batch["attention_mask"][:, :-1]
             gradients = gradients.value
-            gradients = gradients[attn_mask != 0][:, :-1]
+            gradients = gradients[:, :-1][attn_mask != 0]
 
             remaining_space = self.gradient_buffer_size - current_idx
             assert remaining_space > 0

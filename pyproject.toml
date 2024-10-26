@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dictionary_learning"
+version = "0.1.0"
+description = "Short description"
+requires-python = ">=3.10"
+dependencies = [
+    "datasets",
+    "einops",
+    "nnsight",
+    "torch",
+    "tqdm",
+    "zstandard",
+    "wandb"
+]
+
+[tool.setuptools.packages.find]
+include = ["dictionary_learning*"]
