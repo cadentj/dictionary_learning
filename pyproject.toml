@@ -1,0 +1,22 @@
+[project]
+name = "dictionary-learning"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "circuitsvis>=1.43.2",
+    "datasets>=2.18.0",
+    "einops>=0.7.0",
+    "gdown>=5.2.0",
+    "ipykernel>=6.29.5",
+    "matplotlib>=3.8.3",
+    "nnsight==0.3.7",
+    "pandas>=2.2.1",
+    "plotly>=5.18.0",
+    "torch>=2.1.2",
+    "tqdm>=4.66.1",
+    "transformer-lens>=2.14.1",
+    "wandb>=0.19.7",
+    "zstandard>=0.22.0",
+]
